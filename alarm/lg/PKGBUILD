@@ -1,0 +1,53 @@
+# Maintainer: Alex Miller <alexmiller422@gmail.com>
+pkgname=('lgpio' 'python-lgpio')
+pkgbase=lg
+pkgver=0.2.2
+_commit=b959a17d723360e85648316757b02dbea9902feb
+pkgrel=1
+pkgdesc="Linux C libraries and Python modules for manipulating GPIO"
+arch=('aarch64')
+url="https://abyz.me.uk/lg/"
+license=('Unlicense')
+makedepends=(make python-build python-installer python-setuptools python-wheel swig)
+source=("https://github.com/joan2937/lg/archive/$_commit.tar.gz"
+        'lg.patch')
+sha256sums=('8deba50b92d10d4611d85f5af09d4577c42d060e8a10e77208ed15224299637d'
+            '25075ad483e887df510a9efb5c77c3eba09a54a39a82056194af4eea80ede7f1')
+
+prepare() {
+    cd $srcdir/lg-$_commit
+
+    patch -Np1 -i ../lg.patch
+}
+
+build() {
+    cd $srcdir/lg-$_commit
+	make
+
+	cd PY_LGPIO
+	swig -python lgpio.i
+	python -m build --wheel --no-isolation
+}
+
+package_lgpio() {
+    pkgdesc="C library for Linux Single Board Computers which allows control of the General Purpose Input Output pins"
+
+    cd $srcdir/lg-$_commit
+
+    install -m 0755 -d $pkgdir/usr/lib
+    install -m 0755 liblgpio.so.1 $pkgdir/usr/lib
+
+    install -m 0755 -d $pkgdir/usr/include
+    install -m 0644 lgpio.h $pkgdir/usr/include
+
+    cd $pkgdir/usr/lib && ln -fs liblgpio.so.1 liblgpio.so
+}
+
+package_python-lgpio() {
+    pkgdesc="Python wrapper fo lgpio, which allows control of the General Purpose Input Output pins on Linux Single Board Computers"
+    depends=('lgpio' 'python')
+
+    cd $srcdir/lg-$_commit/PY_LGPIO
+
+    python -m installer --destdir="$pkgdir" dist/*.whl
+}

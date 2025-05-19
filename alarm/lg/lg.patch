@@ -1,0 +1,13 @@
+diff --git a/PY_LGPIO/setup.py b/PY_LGPIO/setup.py
+index 0f6893c..94cf373 100644
+--- a/PY_LGPIO/setup.py
++++ b/PY_LGPIO/setup.py
+@@ -9,7 +9,7 @@ from setuptools import setup, Extension
+ with open('README.md') as f:
+     long_description = f.read()
+ 
+-lgpio_module = Extension('_lgpio', sources=['lgpio_wrap.c',], libraries=['lgpio',],)
++lgpio_module = Extension('_lgpio', sources=['lgpio_wrap.c',], libraries=['lgpio',], include_dirs=['../'], library_dirs=['../'],)
+ 
+ setup (name = 'lgpio',
+        version = '0.2.2.0',
